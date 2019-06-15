@@ -1,7 +1,22 @@
+// Copyright (c) 2016-present Cloud <cloud@txthinking.com>
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of version 3 of the GNU General Public
+// License as published by the Free Software Foundation.
+//
+// This program is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 package main
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -19,7 +34,7 @@ var debugAddress string
 func main() {
 	app := cli.NewApp()
 	app.Name = "Brook"
-	app.Version = "20190205"
+	app.Version = "20190601"
 	app.Usage = "A Cross-Platform Proxy/VPN Software"
 	app.Author = "Cloud"
 	app.Email = "cloud@txthinking.com"
@@ -289,6 +304,11 @@ func main() {
 					Name:  "password, p",
 					Usage: "Server password",
 				},
+				cli.StringFlag{
+					Name:  "dns",
+					Value: "8.8.8.8",
+					Usage: "DNS Server, like: 8.8.8.8",
+				},
 				cli.IntFlag{
 					Name:  "tcpTimeout",
 					Value: 60,
@@ -338,7 +358,7 @@ func main() {
 				if debug {
 					enableDebug()
 				}
-				return brook.RunVPN(c.String("listen"), c.String("server"), c.String("password"), c.Int("tcpTimeout"), c.Int("tcpDeadline"), c.Int("udpDeadline"), c.Int("udpSessionTime"), c.String("tunDevice"), c.String("tunIP"), c.String("tunGateway"), c.String("tunMask"))
+				return brook.RunVPN(c.String("listen"), c.String("server"), c.String("password"), c.String("dns"), c.Int("tcpTimeout"), c.Int("tcpDeadline"), c.Int("udpDeadline"), c.Int("udpSessionTime"), c.String("tunDevice"), c.String("tunIP"), c.String("tunGateway"), c.String("tunMask"))
 			},
 		},
 		cli.Command{
@@ -624,6 +644,28 @@ func main() {
 					}
 				}()
 				return <-errch
+			},
+		},
+		cli.Command{
+			Name:  "link",
+			Usage: "Print brook link",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "server, s",
+					Usage: "Server address, like: 1.2.3.4:1080",
+				},
+				cli.StringFlag{
+					Name:  "password, p",
+					Usage: "Server password",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				if c.String("server") == "" || c.String("password") == "" {
+					cli.ShowCommandHelp(c, "link")
+					return nil
+				}
+				fmt.Println(brook.Link(c.String("server"), c.String("password")))
+				return nil
 			},
 		},
 		cli.Command{
