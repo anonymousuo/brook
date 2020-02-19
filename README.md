@@ -1,14 +1,18 @@
 # Brook
 
-[![Build Status](https://travis-ci.org/txthinking/brook.svg?branch=master)](https://travis-ci.org/txthinking/brook) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) [![Wiki](https://img.shields.io/badge/docs-wiki-blue.svg)](https://github.com/txthinking/brook/wiki)
+[![Build Status](https://travis-ci.org/txthinking/brook.svg?branch=master)](https://travis-ci.org/txthinking/brook)
+[![Telegram Group](https://img.shields.io/badge/Telegram%20Group-brookgroup-blue.svg)](https://t.me/brookgroup)
+[![Telegram Channel](https://img.shields.io/badge/Telegram%20Channel-brookchannel-blue.svg)](https://t.me/brookchannel)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](http://www.gnu.org/licenses/gpl-3.0)
+[![Wiki](https://img.shields.io/badge/docs-wiki-yellow.svg)](https://github.com/txthinking/brook/wiki)
 
 <p align="center">
-    <img style="float:right;" src="https://storage.googleapis.com/txthinking-file/_/brook.png" alt="Brook"/>
+    <img style="float:right;" src="https://storage.googleapis.com/txthinking/_/brook.png" alt="Brook"/>
 </p>
 
 ---
 
-### v20200102
+### v20200101
 
 - **🔊 Please uninstall or delete the old GUI client first❗️**
 - Add Brook WebSocket mode, with or without TLS. If with TLS, Brook will automatically request/issue certificate for your domain.
@@ -50,29 +54,29 @@ Brook's goal is to keep it **simple**, **stupid** and **not detectable**.
 
 | Download                                                                                                                         | Server/Client   | OS      | Arch               | Remark |
 | -------------------------------------------------------------------------------------------------------------------------------- | --------------- | ------- | ------------------ | ------ |
-| [brook](https://github.com/txthinking/brook/releases/download/v20200102/brook)                                                   | Server & Client | Linux   | amd64              | CLI    |
-| [brook_linux_386](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_386)                               | Server & Client | Linux   | 386                | CLI    |
-| [brook_linux_arm64](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_arm64)                           | Server & Client | Linux   | arm64              | CLI    |
-| [brook_linux_arm5](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_arm5)                             | Server & Client | Linux   | arm5               | CLI    |
-| [brook_linux_arm6](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_arm6)                             | Server & Client | Linux   | arm6               | CLI    |
-| [brook_linux_arm7](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_arm7)                             | Server & Client | Linux   | arm7               | CLI    |
-| [brook_linux_mips](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_mips)                             | Server & Client | Linux   | mips               | CLI    |
-| [brook_linux_mipsle](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_mipsle)                         | Server & Client | Linux   | mipsle             | CLI    |
-| [brook_linux_mips_softfloat](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_mips_softfloat)         | Server & Client | Linux   | mips_softfloat     | CLI    |
-| [brook_linux_mipsle_softfloat](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_mipsle_softfloat)     | Server & Client | Linux   | mipsle_softfloat   | CLI    |
-| [brook_linux_mips64](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_mips64)                         | Server & Client | Linux   | mips64             | CLI    |
-| [brook_linux_mips64le](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_mips64le)                     | Server & Client | Linux   | mips64le           | CLI    |
-| [brook_linux_mips64_softfloat](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_mips64_softfloat)     | Server & Client | Linux   | mips64_softfloat   | CLI    |
-| [brook_linux_mips64le_softfloat](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_mips64le_softfloat) | Server & Client | Linux   | mips64le_softfloat | CLI    |
-| [brook_linux_ppc64](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_ppc64)                           | Server & Client | Linux   | ppc64              | CLI    |
-| [brook_linux_ppc64le](https://github.com/txthinking/brook/releases/download/v20200102/brook_linux_ppc64le)                       | Server & Client | Linux   | ppc64le            | CLI    |
-| [brook_darwin_amd64](https://github.com/txthinking/brook/releases/download/v20200102/brook_darwin_amd64)                         | Server & Client | macOS   | amd64              | CLI    |
-| [brook_windows_amd64.exe](https://github.com/txthinking/brook/releases/download/v20200102/brook_windows_amd64.exe)               | Server & Client | Windows | amd64              | CLI    |
-| [brook_windows_386.exe](https://github.com/txthinking/brook/releases/download/v20200102/brook_windows_386.exe)                   | Server & Client | Windows | 386                | CLI    |
-| [Brook.pkg](https://github.com/txthinking/brook/releases/download/v20200102/Brook.pkg)                                           | Client          | macOS   | amd64              | GUI    |
-| [Brook.msi](https://github.com/txthinking/brook/releases/download/v20200102/Brook.msi)                                           | Client          | Windows | amd64              | GUI    |
+| [brook](https://github.com/txthinking/brook/releases/download/v20200201/brook)                                                   | Server & Client | Linux   | amd64              | CLI    |
+| [brook_linux_386](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_386)                               | Server & Client | Linux   | 386                | CLI    |
+| [brook_linux_arm64](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_arm64)                           | Server & Client | Linux   | arm64              | CLI    |
+| [brook_linux_arm5](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_arm5)                             | Server & Client | Linux   | arm5               | CLI    |
+| [brook_linux_arm6](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_arm6)                             | Server & Client | Linux   | arm6               | CLI    |
+| [brook_linux_arm7](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_arm7)                             | Server & Client | Linux   | arm7               | CLI    |
+| [brook_linux_mips](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_mips)                             | Server & Client | Linux   | mips               | CLI    |
+| [brook_linux_mipsle](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_mipsle)                         | Server & Client | Linux   | mipsle             | CLI    |
+| [brook_linux_mips_softfloat](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_mips_softfloat)         | Server & Client | Linux   | mips_softfloat     | CLI    |
+| [brook_linux_mipsle_softfloat](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_mipsle_softfloat)     | Server & Client | Linux   | mipsle_softfloat   | CLI    |
+| [brook_linux_mips64](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_mips64)                         | Server & Client | Linux   | mips64             | CLI    |
+| [brook_linux_mips64le](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_mips64le)                     | Server & Client | Linux   | mips64le           | CLI    |
+| [brook_linux_mips64_softfloat](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_mips64_softfloat)     | Server & Client | Linux   | mips64_softfloat   | CLI    |
+| [brook_linux_mips64le_softfloat](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_mips64le_softfloat) | Server & Client | Linux   | mips64le_softfloat | CLI    |
+| [brook_linux_ppc64](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_ppc64)                           | Server & Client | Linux   | ppc64              | CLI    |
+| [brook_linux_ppc64le](https://github.com/txthinking/brook/releases/download/v20200201/brook_linux_ppc64le)                       | Server & Client | Linux   | ppc64le            | CLI    |
+| [brook_darwin_amd64](https://github.com/txthinking/brook/releases/download/v20200201/brook_darwin_amd64)                         | Server & Client | macOS   | amd64              | CLI    |
+| [brook_windows_amd64.exe](https://github.com/txthinking/brook/releases/download/v20200201/brook_windows_amd64.exe)               | Server & Client | Windows | amd64              | CLI    |
+| [brook_windows_386.exe](https://github.com/txthinking/brook/releases/download/v20200201/brook_windows_386.exe)                   | Server & Client | Windows | 386                | CLI    |
+| [Brook.pkg](https://github.com/txthinking/brook/releases/download/v20200201/Brook.pkg)                                           | Client          | macOS   | amd64              | GUI    |
+| [Brook.msi](https://github.com/txthinking/brook/releases/download/v20200201/Brook.msi)                                           | Client          | Windows | amd64              | GUI    |
 | [App Store](https://itunes.apple.com/us/app/brook-brook-shadowsocks-vpn-proxy/id1216002642)                                      | Client          | iOS     | -                  | GUI    |
-| [Brook.apk](https://github.com/txthinking/brook/releases/download/v20200102/Brook.apk)(No Google Play)                           | Client          | Android | -                  | GUI    |
+| [Brook.apk](https://github.com/txthinking/brook/releases/download/v20200201/Brook.apk)(No Google Play)                           | Client          | Android | -                  | GUI    |
 
 **See [wiki](https://github.com/txthinking/brook/wiki) for more tutorials**
 
@@ -100,7 +104,7 @@ USAGE:
    brook [global options] command [command options] [arguments...]
 
 VERSION:
-   20200101
+   20200201
 
 COMMANDS:
    server        Run as server mode
