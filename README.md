@@ -54,15 +54,23 @@ or install CLI on Archlinux
 pacman -S brook
 ```
 
+or install CLI using go get
+
+```
+go get github.com/txthinking/brook/cli/brook
+```
+
+or download CLI from [releases](https://github.com/txthinking/brook/releases)
+
 or install GUI on macOS
 
 ```
 brew cask install brook
 ```
 
-or download CLI or GUI from [releases](https://github.com/txthinking/brook/releases)
+or download GUI: [macOS](https://github.com/txthinking/brook/releases/download/v20200201/Brook.pkg), [Windows](https://github.com/txthinking/brook/releases/download/v20200201/Brook.msi), [Android](https://github.com/txthinking/brook/releases/download/v20200201/Brook.apk), [iOS](https://apps.apple.com/us/app/brook-a-cross-platform-proxy/id1216002642)
 
-> CLI contains server and client, GUI only contains client
+> CLI contains server and client, GUI only contains client. iOS client only supports non-China AppStore.
 
 ## Brook
 
@@ -129,7 +137,7 @@ $ brook client -l 127.0.0.1:1080 -i 127.0.0.1 -s server_address:port -p password
 ```
 
 ```
-# Run as brook client, start a http(s) proxy http(s)://127.0.0.1:8080
+# Run as brook client, start a http proxy http://127.0.0.1:8080
 $ brook client -l 127.0.0.1:8080 -i 127.0.0.1 -s server_address:port -p password --http
 ```
 
