@@ -27,7 +27,6 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/txthinking/brook"
-	"github.com/txthinking/brook/sysproxy"
 	"github.com/urfave/cli"
 )
 
@@ -37,7 +36,7 @@ var debugAddress string
 func main() {
 	app := cli.NewApp()
 	app.Name = "Brook"
-	app.Version = "20200502"
+	app.Version = "20200701"
 	app.Usage = "A cross-platform strong encryption and not detectable proxy"
 	app.Authors = []*cli.Author{
 		{
@@ -327,7 +326,7 @@ func main() {
 				},
 				&cli.StringFlag{
 					Name:  "defaultDNSServer",
-					Usage: "Default DNS server",
+					Usage: "DNS server for resolving domains NOT in list",
 					Value: "8.8.8.8:53",
 				},
 				&cli.StringFlag{
@@ -472,95 +471,10 @@ func main() {
 		},
 		&cli.Command{
 			Name:  "tun",
-			Usage: "Run as tun, both TCP and UDP, [src <-> $ brook tun <-> $ brook server <-> dst], [works with $ brook server]",
-			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:    "server",
-					Aliases: []string{"s"},
-					Usage:   "Brook server address, like: 1.2.3.4:1080",
-				},
-				&cli.StringFlag{
-					Name:    "password",
-					Aliases: []string{"p"},
-					Usage:   "Brook server password",
-				},
-				&cli.StringFlag{
-					Name:    "listen",
-					Aliases: []string{"l"},
-					Usage:   "Listen address, MUST contain IP, like: 127.0.0.1:1080",
-				},
-				&cli.StringFlag{
-					Name:  "dns",
-					Value: "8.8.8.8",
-					Usage: "DNS Server, like: 8.8.8.8",
-				},
-				&cli.IntFlag{
-					Name:  "tcpTimeout",
-					Value: 60,
-					Usage: "connection tcp keepalive timeout (s)",
-				},
-				&cli.IntFlag{
-					Name:  "tcpDeadline",
-					Value: 0,
-					Usage: "connection deadline time (s)",
-				},
-				&cli.IntFlag{
-					Name:  "udpDeadline",
-					Value: 60,
-					Usage: "connection deadline time (s)",
-				},
-				&cli.IntFlag{
-					Name:  "udpSessionTime",
-					Value: 60,
-					Usage: "udp session time (s), in most cases need this",
-				},
-				&cli.StringFlag{
-					Name:  "tunDevice",
-					Usage: "tun name",
-					Value: "tun0",
-				},
-				&cli.StringFlag{
-					Name:  "tunIP",
-					Usage: "tun IP",
-					Value: "10.9.9.2",
-				},
-				&cli.StringFlag{
-					Name:  "tunGateway",
-					Usage: "tun gateway",
-					Value: "10.9.9.1",
-				},
-				&cli.StringFlag{
-					Name:  "tunMask",
-					Usage: "tun mask",
-					Value: "255.255.255.0",
-				},
-				&cli.BoolFlag{
-					Name:  "letBrookDoAllForMe",
-					Usage: "See more: https://github.com/txthinking/brook/wiki/How-to-run-tun-on-Linux,-macOS-and-Windows",
-				},
-			},
+			Usage: "tun",
+			Flags: []cli.Flag{},
 			Action: func(c *cli.Context) error {
-				if c.String("listen") == "" || c.String("server") == "" || c.String("password") == "" {
-					cli.ShowCommandHelp(c, "tun")
-					return nil
-				}
-				if debug {
-					enableDebug()
-				}
-				s, err := brook.NewTun(c.String("listen"), c.String("server"), c.String("password"), c.String("dns"), c.Int("tcpTimeout"), c.Int("tcpDeadline"), c.Int("udpDeadline"), c.Int("udpSessionTime"), c.String("tunDevice"), c.String("tunIP"), c.String("tunGateway"), c.String("tunMask"))
-				if err != nil {
-					return err
-				}
-				s.LetBrookDoAllForMe = c.Bool("letBrookDoAllForMe")
-				go func() {
-					fmt.Println("Ctrl-C to quit")
-					log.Println(s.ListenAndServe())
-				}()
-				sigs := make(chan os.Signal, 1)
-				signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-				<-sigs
-				fmt.Println("Quitting...")
-				return s.Shutdown()
+				return errors.New("Deprecated, please try https://github.com/txthinking/ipio")
 			},
 		},
 		&cli.Command{
@@ -925,7 +839,7 @@ func main() {
 				&cli.StringFlag{
 					Name:    "socks5",
 					Aliases: []string{"s"},
-					Usage:   "Socks5 server address",
+					Usage:   "Socks5 server address, like: 127.0.0.1:1080",
 				},
 				&cli.StringFlag{
 					Name:  "socks5username",
@@ -960,6 +874,75 @@ func main() {
 					enableDebug()
 				}
 				s, err := brook.NewSocks5ToHTTP(c.String("listen"), c.String("socks5"), c.String("socks5username"), c.String("socks5password"), c.Int("timeout"), c.Int("deadline"))
+				if err != nil {
+					return err
+				}
+				go func() {
+					sigs := make(chan os.Signal, 1)
+					signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+					<-sigs
+					s.Shutdown()
+				}()
+				return s.ListenAndServe()
+			},
+		},
+		&cli.Command{
+			Name:  "hijackhttps",
+			Usage: "Hijack domains and assume is TCP/TLS/443. Requesting these domains from anywhere in the system will be hijacked . [src <-> $ brook hijackhttps <-> socks5 server] or [src <-> direct]",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    "socks5",
+					Aliases: []string{"s"},
+					Usage:   "Socks5 server address, like: 127.0.0.1:1080",
+				},
+				&cli.StringFlag{
+					Name:  "socks5username",
+					Usage: "Socks5 username, optional",
+				},
+				&cli.StringFlag{
+					Name:  "socks5password",
+					Usage: "Socks5 password, optional",
+				},
+				&cli.StringFlag{
+					Name:  "listendnsip",
+					Usage: "127.0.0.1 or ::1, will create a DNS server with it, and listen TCP 443 on it",
+					Value: "127.0.0.1",
+				},
+				&cli.StringFlag{
+					Name:  "defaultDNSServer",
+					Usage: "DNS server for resolving domains NOT in list",
+					Value: "8.8.8.8:53",
+				},
+				&cli.StringFlag{
+					Name:  "list",
+					Usage: "Only domains in list will be hijacked. https://, http:// or local file path",
+					Value: "https://txthinking.github.io/blackwhite/black.list",
+				},
+				&cli.IntFlag{
+					Name:  "tcpTimeout",
+					Value: 60,
+					Usage: "connection tcp keepalive timeout (s)",
+				},
+				&cli.IntFlag{
+					Name:  "tcpDeadline",
+					Value: 0,
+					Usage: "connection deadline time (s)",
+				},
+				&cli.IntFlag{
+					Name:  "udpDeadline",
+					Value: 60,
+					Usage: "connection deadline time (s)",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				if c.String("socks5") == "" {
+					cli.ShowCommandHelp(c, "hijackhttps")
+					return nil
+				}
+				if debug {
+					enableDebug()
+				}
+				s, err := brook.NewHijackHTTPS(c.String("socks5"), c.String("socks5username"), c.String("socks5password"), c.String("listendnsip"), c.String("defaultDNSServer"), c.String("list"), c.Int("tcpTimeout"), c.Int("tcpDeadline"), c.Int("udpDeadline"))
 				if err != nil {
 					return err
 				}
@@ -1027,38 +1010,6 @@ func main() {
 					p.Shutdown()
 				}()
 				return p.ListenAndServe()
-			},
-		},
-		&cli.Command{
-			Name:  "systemproxy",
-			Usage: "Set system proxy with pac url, or remove, only works on macOS/Windows",
-			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:    "url",
-					Aliases: []string{"u"},
-					Usage:   "Pac address: like: http://127.0.0.1/pac",
-				},
-				&cli.BoolFlag{
-					Name:    "remove",
-					Aliases: []string{"r"},
-					Usage:   "Remove pac url from system proxy",
-				},
-			},
-			Action: func(c *cli.Context) error {
-				if !c.Bool("remove") && c.String("url") == "" {
-					cli.ShowCommandHelp(c, "systemproxy")
-					return nil
-				}
-				if c.Bool("remove") {
-					if err := sysproxy.TurnOffSystemProxy(); err != nil {
-						return err
-					}
-					return nil
-				}
-				if err := sysproxy.TurnOnSystemProxy(c.String("url")); err != nil {
-					return err
-				}
-				return nil
 			},
 		},
 		&cli.Command{
@@ -1175,7 +1126,7 @@ func main() {
 		},
 		&cli.Command{
 			Name:  "ssclient",
-			Usage: "Run as shadowsocks client, both TCP and UDP, to start a socks5 proxy or a http proxy, fixed method is aes-256-cfb, [src <-> $ brook ssclient <-> $ brook ssserver <-> dst], [works with $ brook ssserver]",
+			Usage: "Run as shadowsocks client, both TCP and UDP, to start socks5 or http proxy, method is aes-256-cfb, [src <-> $ brook ssclient <-> $ brook ssserver <-> dst], [works with $ brook ssserver]",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:    "ssserver",
