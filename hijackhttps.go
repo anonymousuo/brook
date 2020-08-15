@@ -33,24 +33,23 @@ import (
 
 // HijackHTTPS.
 type HijackHTTPS struct {
-	Dial         proxy.Dialer
-	ListenDNSIP  string
-	DefaultDNS   string
-	Domains      map[string]byte
-	UDPDNSServer *dns.Server
-	TCPDNSServer *dns.Server
-	HTTPSServer  net.Listener
-	TCPDeadline  int
-	TCPTimeout   int
-	UDPDeadline  int
-	RunnerGroup  *runnergroup.RunnerGroup
+	Dial               proxy.Dialer
+	ListenIP           string
+	DNSServerForBypass string
+	BypassDomains      map[string]byte
+	UDPDNSServer       *dns.Server
+	TCPDNSServer       *dns.Server
+	HTTPSServer        net.Listener
+	TCPTimeout         int
+	UDPTimeout         int
+	RunnerGroup        *runnergroup.RunnerGroup
 }
 
 // NewHijackHTTPS.
-func NewHijackHTTPS(socks5addr, socks5username, socks5password, listendnsip, defaultDNS, list string, tcpTimeout, tcpDeadline, udpDeadline int) (*HijackHTTPS, error) {
+func NewHijackHTTPS(socks5addr, socks5username, socks5password, listenIP, dnsForBypass, bypassList string, tcpTimeout, udpTimeout int) (*HijackHTTPS, error) {
 	ds := make(map[string]byte)
-	if list != "" {
-		ss, err := readList(list)
+	if bypassList != "" {
+		ss, err := readList(bypassList)
 		if err != nil {
 			return nil, err
 		}
@@ -84,14 +83,13 @@ func NewHijackHTTPS(socks5addr, socks5username, socks5password, listendnsip, def
 		log.Println("Try to raise system limits, got", err)
 	}
 	s := &HijackHTTPS{
-		Dial:        dial,
-		ListenDNSIP: listendnsip,
-		DefaultDNS:  defaultDNS,
-		Domains:     ds,
-		TCPTimeout:  tcpTimeout,
-		TCPDeadline: tcpDeadline,
-		UDPDeadline: udpDeadline,
-		RunnerGroup: runnergroup.New(),
+		Dial:               dial,
+		ListenIP:           listenIP,
+		DNSServerForBypass: dnsForBypass,
+		BypassDomains:      ds,
+		TCPTimeout:         tcpTimeout,
+		UDPTimeout:         udpTimeout,
+		RunnerGroup:        runnergroup.New(),
 	}
 	return s, nil
 }
@@ -139,10 +137,10 @@ func (s *HijackHTTPS) ListenAndServe() error {
 
 func (s *HijackHTTPS) RunUDPDNSServer() error {
 	s.UDPDNSServer = &dns.Server{
-		Addr:         net.JoinHostPort(s.ListenDNSIP, "53"),
+		Addr:         net.JoinHostPort(s.ListenIP, "53"),
 		Net:          "udp",
-		ReadTimeout:  time.Duration(s.UDPDeadline) * time.Second,
-		WriteTimeout: time.Duration(s.UDPDeadline) * time.Second,
+		ReadTimeout:  time.Duration(s.UDPTimeout) * time.Second,
+		WriteTimeout: time.Duration(s.UDPTimeout) * time.Second,
 	}
 	s.UDPDNSServer.Handler = s.DNSHandle("udp")
 	return s.UDPDNSServer.ListenAndServe()
@@ -150,7 +148,7 @@ func (s *HijackHTTPS) RunUDPDNSServer() error {
 
 func (s *HijackHTTPS) RunTCPDNSServer() error {
 	s.TCPDNSServer = &dns.Server{
-		Addr:         net.JoinHostPort(s.ListenDNSIP, "53"),
+		Addr:         net.JoinHostPort(s.ListenIP, "53"),
 		Net:          "tcp",
 		ReadTimeout:  time.Duration(s.TCPTimeout) * time.Second,
 		WriteTimeout: time.Duration(s.TCPTimeout) * time.Second,
@@ -173,32 +171,32 @@ func (s *HijackHTTPS) DNSHandle(network string) dns.Handler {
 				}
 			}
 		}
-		if !has {
+		if has {
 			debug("dns hijack", r.Question[0].Name)
 			m := &dns.Msg{}
 			m.SetReply(r)
 			m.Authoritative = true
 			m.Answer = append(m.Answer, &dns.A{
 				Hdr: dns.RR_Header{Name: m.Question[0].Name, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: 60},
-				A:   net.ParseIP(s.ListenDNSIP),
+				A:   net.ParseIP(s.ListenIP),
 			})
 			w.WriteMsg(m)
 			return
 		}
-		conn, err := Dial.Dial(network, s.DefaultDNS)
+		conn, err := Dial.Dial(network, s.DNSServerForBypass)
 		if err != nil {
 			log.Println(err)
 			return
 		}
 		defer conn.Close()
-		if network == "tcp" && s.TCPDeadline != 0 {
-			if err := conn.SetDeadline(time.Now().Add(time.Duration(s.TCPDeadline) * time.Second)); err != nil {
+		if network == "tcp" && s.TCPTimeout != 0 {
+			if err := conn.SetDeadline(time.Now().Add(time.Duration(s.TCPTimeout) * time.Second)); err != nil {
 				log.Println(err)
 				return
 			}
 		}
-		if network == "udp" && s.UDPDeadline != 0 {
-			if err := conn.SetDeadline(time.Now().Add(time.Duration(s.UDPDeadline) * time.Second)); err != nil {
+		if network == "udp" && s.UDPTimeout != 0 {
+			if err := conn.SetDeadline(time.Now().Add(time.Duration(s.UDPTimeout) * time.Second)); err != nil {
 				log.Println(err)
 				return
 			}
@@ -219,7 +217,7 @@ func (s *HijackHTTPS) DNSHandle(network string) dns.Handler {
 
 func (s *HijackHTTPS) RunHTTPSServer() error {
 	var err error
-	s.HTTPSServer, err = net.Listen("tcp", net.JoinHostPort(s.ListenDNSIP, "443"))
+	s.HTTPSServer, err = net.Listen("tcp", net.JoinHostPort(s.ListenIP, "443"))
 	if err != nil {
 		return err
 	}
@@ -231,13 +229,7 @@ func (s *HijackHTTPS) RunHTTPSServer() error {
 		go func(c net.Conn) {
 			defer c.Close()
 			if s.TCPTimeout != 0 {
-				if err := c.(*net.TCPConn).SetKeepAlivePeriod(time.Duration(s.TCPTimeout) * time.Second); err != nil {
-					log.Println(err)
-					return
-				}
-			}
-			if s.TCPDeadline != 0 {
-				if err := c.SetDeadline(time.Now().Add(time.Duration(s.TCPDeadline) * time.Second)); err != nil {
+				if err := c.SetDeadline(time.Now().Add(time.Duration(s.TCPTimeout) * time.Second)); err != nil {
 					log.Println(err)
 					return
 				}
@@ -370,8 +362,8 @@ func (s *HijackHTTPS) HTTPSHandle(c net.Conn) error {
 	go func() {
 		var bf [1024 * 2]byte
 		for {
-			if s.TCPDeadline != 0 {
-				if err := rc.SetDeadline(time.Now().Add(time.Duration(s.TCPDeadline) * time.Second)); err != nil {
+			if s.TCPTimeout != 0 {
+				if err := rc.SetDeadline(time.Now().Add(time.Duration(s.TCPTimeout) * time.Second)); err != nil {
 					return
 				}
 			}
@@ -386,8 +378,8 @@ func (s *HijackHTTPS) HTTPSHandle(c net.Conn) error {
 	}()
 	var bf [1024 * 2]byte
 	for {
-		if s.TCPDeadline != 0 {
-			if err := c.SetDeadline(time.Now().Add(time.Duration(s.TCPDeadline) * time.Second)); err != nil {
+		if s.TCPTimeout != 0 {
+			if err := c.SetDeadline(time.Now().Add(time.Duration(s.TCPTimeout) * time.Second)); err != nil {
 				return nil
 			}
 		}
@@ -415,7 +407,7 @@ func (s *HijackHTTPS) Has(host string) bool {
 		} else {
 			s1 = ss[i] + "." + s1
 		}
-		if _, ok := s.Domains[s1]; ok {
+		if _, ok := s.BypassDomains[s1]; ok {
 			return true
 		}
 	}

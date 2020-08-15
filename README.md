@@ -4,8 +4,7 @@
 [![Wiki](https://img.shields.io/badge/docs-wiki-yellow.svg)](https://github.com/txthinking/brook/wiki)
 [![Slides](https://img.shields.io/badge/Tutorial-Slides-blueviolet.svg)](https://talks.txthinking.com)
 [![Youtube](https://img.shields.io/badge/Tutorial-Youtube-red.svg)](https://www.youtube.com/channel/UC5j8-I5Y4lWo4KTa4_0Kx5A)
-[![Telegram Group](https://img.shields.io/badge/Telegram%20Group-brookgroup-blue.svg)](https://t.me/brookgroup)
-[![Telegram Channel](https://img.shields.io/badge/Telegram%20Channel-brookchannel-blue.svg)](https://t.me/brookchannel)
+[![Google Chat](https://img.shields.io/badge/Google-Chat-blue.svg)](https://docs.google.com/forms/d/e/1FAIpQLSd61-WE__WYiDee2UWjhDKNcb-A6KQW9xwzFkeYiAmQ3dpEcA/viewform)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
 <p align="center">
@@ -14,15 +13,11 @@
 
 ---
 
-**v20200701**
+**v20200801**
 
-* CLI:
-  * New subcommand `$ brook hijackhttps`
-  * Optimization
-* GUI:
-  * macOS: add tun
-  * Android: support IPv6
-  * Other minor changes
+* Performance optimization
+* Some subcommand parameter changes
+* NAT: Symmetric (Need to upgrade both server and client)
 
 ---
 
@@ -43,7 +38,6 @@
 - [Socks5 Server](#socks5-server)
 - [Socks5 to HTTP](#socks5-to-http)
 - [PAC](#pac)
-- [Shadowsocks](#shadowsocks)
 - [How to](#how-to)
 - [Contributing](#contributing)
 - [License](#license)
@@ -75,7 +69,7 @@ install GUI on macOS
 brew cask install brook
 ```
 
-**or download GUI: [macOS](https://github.com/txthinking/brook/releases/download/v20200701/Brook.dmg), [Windows](https://github.com/txthinking/brook/releases/download/v20200701/Brook.exe), [Android](https://github.com/txthinking/brook/releases/download/v20200701/Brook.apk), [iOS](https://apps.apple.com/us/app/brook-a-cross-platform-proxy/id1216002642)**
+**or download GUI: [macOS](https://github.com/txthinking/brook/releases/download/v20200801/Brook.dmg), [Windows](https://github.com/txthinking/brook/releases/download/v20200801/Brook.exe), [Android](https://github.com/txthinking/brook/releases/download/v20200801/Brook.apk), [iOS](https://github.com/txthinking/brook/issues/698)**
 
 > CLI contains server and client, GUI only contains client. iOS client only supports non-China AppStore.
 
@@ -86,10 +80,10 @@ NAME:
    Brook - A cross-platform strong encryption and not detectable proxy
 
 USAGE:
-   brook_darwin_amd64 [global options] command [command options] [arguments...]
+   brook [global options] command [command options] [arguments...]
 
 VERSION:
-   20200701
+   20200801
 
 AUTHOR:
    Cloud <cloud@txthinking.com>
@@ -99,7 +93,7 @@ COMMANDS:
    servers       Run as multiple brook servers
    client        Run as brook client, both TCP and UDP, to start a socks5 proxy or a http proxy, [src <-> $ brook client <-> $ brook server <-> dst], [works with $ brook server]
    tunnel        Run as tunnel, both TCP and UDP, this means access [listen address] is equal to [to address], [src <-> listen address <-> $ brook server <-> to address], [works with $ brook server]
-   dns           Run as DNS server, both TCP and UDP, [src <-> $ brook dns <-> $ brook server <-> default dns server] or [src <-> $ brook dns <-> list dns server], [works with $ brook server]
+   dns           Run as DNS server, both TCP and UDP, [src <-> $ brook dns <-> $ brook server <-> dns server] or [src <-> $ brook dns <-> dns server for bypass], [works with $ brook server]
    tproxy        Run as transparent proxy, both TCP and UDP, only works on Linux, [src <-> $ brook tproxy <-> $ brook server <-> dst], [works with $ brook server]
    tun           tun
    wsserver      Run as brook wsserver, both TCP and UDP, it will start a standard http(s) server and websocket server
@@ -112,9 +106,6 @@ COMMANDS:
    socks5tohttp  Convert socks5 to http proxy, [src <-> listen address(http proxy) <-> socks5 address <-> dst]
    hijackhttps   Hijack domains and assume is TCP/TLS/443. Requesting these domains from anywhere in the system will be hijacked . [src <-> $ brook hijackhttps <-> socks5 server] or [src <-> direct]
    pac           Run as PAC server or save PAC to file
-   ssserver      Run as shadowsocks server, both TCP and UDP, fixed method is aes-256-cfb
-   ssservers     Run as shadowsocks multiple servers, fixed method is aes-256-cfb
-   ssclient      Run as shadowsocks client, both TCP and UDP, to start socks5 or http proxy, method is aes-256-cfb, [src <-> $ brook ssclient <-> $ brook ssserver <-> dst], [works with $ brook ssserver]
    howto         Print some useful tutorial resources
    help, h       Shows a list of commands or help for one command
 
@@ -220,7 +211,7 @@ $ brook qr -s wss://wsserver_domain:port -p password
 
 ```
 # Run as relay
-$ brook relay -l listen_address:port -r relay_to_address:port
+$ brook relay -l listen_address:port -t relay_to_address:port
 ```
 
 > More parameters: $ brook relay -h
@@ -255,24 +246,6 @@ $ brook pac -f /path/to/file.pac
 
 > More parameters: $ brook pac -h
 
-### Shadowsocks
-
-```
-# Run as shadowsocks server
-$ brook ssserver -l listen_address:port -p password
-```
-
-> More parameters: $ brook ssserver -h
-
-```
-# Run as shadowsocks client, connect to shadowsocks server, start a socks5 proxy server
-$ brook ssclient -s ssserver_address:port -p password -l listen_address:port -i socks5_server_ip
-```
-
-> More parameters: $ brook ssclient -h
-
-> Fixed method is aes-256-cfb
-
 ### How to
 
 Some useful tutorial resources
@@ -281,8 +254,6 @@ Some useful tutorial resources
 * Brook Issues: https://github.com/txthinking/brook/issues
 * Slides: https://talks.txthinking.com
 * Youtube: https://www.youtube.com/channel/UC5j8-I5Y4lWo4KTa4_0Kx5A
-* Telegram Group: https://t.me/brookgroup
-* Telegram Channel: https://t.me/brookchannel
 * Nami: https://github.com/txthinking/nami
 * Joker: https://github.com/txthinking/joker
 
