@@ -14,20 +14,19 @@
 
 ## Brook CLI files and GUI files
 
-**Usually**, if you use Brook, you will need a combination of **Server** and **Client**, **Of course**Brook CLI also has **many other independent functions**
+**Usually**, if you use Brook, you will need a combination of **Server** and **Client**, **Of course** Brook CLI also has **many other independent functions**
 
 - Brook CLI file
 
     - The Brook CLI file is an **independent command file**, it can be said that there is no concept of installation, just download this file to your computer, **run it after granting it executable permissions in the command line interface**
     - Brook CLI file has both **server function** and **client function**, Brook CLI file also has **many other independent functions**
     - If you are under Linux and you are not very familiar with Linux, **It is strongly recommended to use the ubuntu system and root user** to run commands. The command to switch to the root user is `$ sudo su`
+    - **Each function of Brook requires only one command, no configuration is required**
 
 - Brook GUI file
 
     - **Keep system up to date**
     - Brook GUI file is a graphical client, only has **client function**
-    - macOS GUI client, **first time run it needs to be allowd in [System Preferences]-[Security and Privacy]-[General]**
-    - Windows GUI client, **Brook.msi, after installation, desktop shortcuts are not automatically created**, which can be found in C:\Program Files (x86) or C:\Program Files
 
 **Brook files description**, all can be downloaded in [Releases](https://github.com/txthinking/brook/releases/tag/v20210214) page
 
@@ -59,7 +58,7 @@
 | brook_windows_386.exe| CLI| Windows 32 bit |
 | brook_darwin_amd64.exe| CLI| macOS 64 bit |
 | Brook.dmg | GUI| macOS 64 bit |
-| Brook.msi | GUI| Windows 64 bit |
+| Brook.exe | GUI| Windows 64 bit |
 | Brook.apk | GUI| Android |
 | BrookLite.dmg | GUI| macOS 64 bit |
 | BrookLite.exe | GUI| Windows 64 bit |

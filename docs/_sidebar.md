@@ -7,7 +7,6 @@
 * Server and Client
 
     * [[CLI] $ brook server](brook-server.md)
-    * [[CLI] Daemon with joker](joker.md)
     * [[CLI] $ brook client](brook-client.md)
     * [[GUI] Client](brook-client-gui.md)
 
@@ -42,6 +41,7 @@
 * Socks5
 
     * [[CLI] $ brook socks5](brook-socks5.md)
+    * [[GUI] Client](socks5-client-gui.md)
 
 * Socks5 to HTTP
 
@@ -65,9 +65,10 @@
 
 * Resources
 
+    * [Install script](installscript.md)
     * [Blog and Video](blogvideo.md)
     * [Community](community.md)
-    * [Resources](resources.md)
+    * [Telegram](telegram.md)
 
 * Spec
 

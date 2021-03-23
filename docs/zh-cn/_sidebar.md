@@ -7,7 +7,6 @@
 * 服务端和客户端
 
     * [[CLI] $ brook server](brook-server.md)
-    * [[CLI] 用joker守护进程](joker.md)
     * [[CLI] $ brook client](brook-client.md)
     * [[GUI] 图形客户端](brook-client-gui.md)
 
@@ -42,6 +41,7 @@
 * Socks5
 
     * [[CLI] $ brook socks5](brook-socks5.md)
+    * [[GUI] 图形客户端](socks5-client-gui.md)
 
 * Socks5 转 HTTP 代理
 
@@ -65,9 +65,10 @@
 
 * 资源
 
+    * [一键脚本](installscript.md)
     * [博客和视频](blogvideo.md)
     * [论坛](community.md)
-    * [相关资源](resources.md)
+    * [Telegram](telegram.md)
 
 * 协议
 

@@ -21,13 +21,12 @@
     - Brook CLI文件是一个**独立的命令文件**, 可以说没有安装的概念, 只需要下载这个文件到你电脑, **在命令行界面赋予它可执行权限后运行它即可**
     - Brook CLI文件同时具有**服务端功能**和**客户端的功能**, Brook CLI文件还有**很多其他独立功能**
     - 如果你在Linux下, 你又不是非常熟悉Linux, **强烈建议使用ubuntu系统和root用户**来运行命令, 切换到root用户的命令是 `$ sudo su`
+    - **Brook的每个功能都只需要一条命令即可, 无需配置**
 
 - Brook GUI 文件
 
     - **保持系统版本最新**
     - Brook GUI文件是图形客户端, 只具有**客户端功能**
-    - Brook macOS 图形客户端, **首次运行需要在[系统偏好]-[安全与隐私]-[通用]里放行**
-    - Brook Windows 图形客户端, **Brook.msi, 安装后并不会自动创建桌面快捷方式**, 可以在C:\Program Files (x86)或C:\Program Files里找到
 
 **Brook 文件说明**, 都可以在[Releases](https://github.com/txthinking/brook/releases/tag/v20210214)页面下载
 
@@ -59,7 +58,7 @@
 | brook_windows_386.exe| CLI| Windows 32位 |
 | brook_darwin_amd64.exe| CLI| macOS 64位 |
 | Brook.dmg | GUI| macOS 64位 |
-| Brook.msi | GUI| Windows 64位 |
+| Brook.exe | GUI| Windows 64位 |
 | Brook.apk | GUI| Android |
 | BrookLite.dmg | GUI| macOS 64 bit |
 | BrookLite.exe | GUI| Windows 64 bit |
