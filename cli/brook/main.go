@@ -15,17 +15,22 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"log"
 	"net"
 	"os"
+	"os/exec"
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"net/http"
 	_ "net/http/pprof"
+	"net/url"
 
 	"github.com/txthinking/brook"
 	"github.com/urfave/cli/v2"
@@ -37,7 +42,7 @@ var debugAddress string
 func main() {
 	app := cli.NewApp()
 	app.Name = "Brook"
-	app.Version = "20210214"
+	app.Version = "20210401"
 	app.Usage = "A cross-platform strong encryption and not detectable proxy"
 	app.Authors = []*cli.Author{
 		{
@@ -62,6 +67,106 @@ func main() {
 		},
 	}
 	app.Commands = []*cli.Command{
+		&cli.Command{
+			Name:  "connect",
+			Usage: "Connect via standard sharing link (brook server & wsserver & wssserver)",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    "link",
+					Aliases: []string{"l"},
+					Usage:   "specify the sharing link",
+				},
+				&cli.StringFlag{
+					Name:    "socks5",
+					Aliases: []string{"s"},
+					Value:   "127.0.0.1:1080",
+					Usage:   "where to listen for SOCKS5 connections",
+				},
+				&cli.IntFlag{
+					Name:  "tcpTimeout",
+					Value: 0,
+					Usage: "connection deadline time (s)",
+				},
+				&cli.IntFlag{
+					Name:  "udpTimeout",
+					Value: 60,
+					Usage: "connection deadline time (s)",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				if c.String("link") == "" {
+					cli.ShowCommandHelp(c, "connect")
+					return nil
+				}
+				if debug {
+					enableDebug()
+				}
+				h, p, err := net.SplitHostPort(c.String("socks5"))
+				if err != nil {
+					return err
+				}
+				if h == "" {
+					return errors.New("socks5 server requires a clear IP, only port is not enough. You may use loopback IP or lan IP or other, we can not decide for you")
+				}
+				sharinglink := c.String("link")
+
+				tmp := strings.Split(sharinglink, "brook://")
+				if len(tmp) != 2 {
+					return errors.New("invaild sharing link")
+				}
+
+				sharinglink, err = url.QueryUnescape(tmp[1])
+				if err != nil {
+					return errors.New("invaild sharing link")
+				}
+
+				tmp = strings.Split(sharinglink, " ")
+				if len(tmp) != 2 {
+					return errors.New("invaild sharing link")
+				}
+
+				server := tmp[0]
+				password := tmp[1]
+				protocol := strings.Split(server, "://")[0]
+				if protocol == "ws" {
+					s, err := brook.NewWSClient(":"+p, h, server, password, c.Int("tcpTimeout"), c.Int("udpTimeout"))
+					if err != nil {
+						return err
+					}
+					go func() {
+						sigs := make(chan os.Signal, 1)
+						signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+						<-sigs
+						s.Shutdown()
+					}()
+					return s.ListenAndServe()
+				} else if protocol == "wss" {
+					s, err := brook.NewWSClient(":"+p, h, server, password, c.Int("tcpTimeout"), c.Int("udpTimeout"))
+					if err != nil {
+						return err
+					}
+					go func() {
+						sigs := make(chan os.Signal, 1)
+						signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+						<-sigs
+						s.Shutdown()
+					}()
+					return s.ListenAndServe()
+				} else {
+					s, err := brook.NewClient(":"+p, h, server, password, c.Int("tcpTimeout"), c.Int("udpTimeout"))
+					if err != nil {
+						return err
+					}
+					go func() {
+						sigs := make(chan os.Signal, 1)
+						signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+						<-sigs
+						s.Shutdown()
+					}()
+					return s.ListenAndServe()
+				}
+			},
+		},
 		&cli.Command{
 			Name:  "server",
 			Usage: "Run as brook server, both TCP and UDP",
@@ -394,9 +499,9 @@ func main() {
 					Name:  "doNotRunScripts",
 					Usage: "This will not change iptables and others",
 				},
-				&cli.BoolFlag{
-					Name:  "clean",
-					Usage: "Clean things the brook scripts did before if need. Example: $ brook tproxy --clean",
+				&cli.StringFlag{
+					Name:  "webListen",
+					Usage: "Ignore all other parameters, run web UI, like: ':6666'",
 				},
 				&cli.IntFlag{
 					Name:  "tcpTimeout",
@@ -410,15 +515,79 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				if c.Bool("clean") {
-					s, err := brook.NewTproxy(":0", ":0", "", false, "", "", 0, 60)
+				if c.String("webListen") != "" {
+					if err := os.WriteFile("/root/.brook.pid", []byte(fmt.Sprintf("%d", os.Getpid())), 0666); err != nil {
+						return err
+					}
+					web, err := fs.Sub(static, "static")
 					if err != nil {
 						return err
 					}
-					if err := s.ClearAutoScripts(); err != nil {
-						return err
+					var cmd *exec.Cmd
+					// TODO lock
+					b, _ := os.ReadFile("/root/.brook.args")
+					if len(b) != 0 {
+						s, err := os.Executable()
+						if err != nil {
+							return err
+						}
+						cmd = exec.Command("/bin/sh", "-c", s+" tproxy "+string(b))
+						go func() {
+							time.Sleep(30 * time.Second)
+							out, _ := cmd.CombinedOutput()
+							os.WriteFile("/root/.brook.tproxy.err", out, 0666)
+							cmd = nil
+						}()
 					}
-					return nil
+					m := http.NewServeMux()
+					m.Handle("/", http.FileServer(http.FS(web)))
+					m.HandleFunc("/connect", func(w http.ResponseWriter, r *http.Request) {
+						s, err := os.Executable()
+						if err != nil {
+							http.Error(w, err.Error(), 500)
+							return
+						}
+						os.WriteFile("/root/.brook.args", []byte(r.FormValue("args")), 0666)
+						cmd = exec.Command("/bin/sh", "-c", s+" tproxy "+r.FormValue("args"))
+						go func() {
+							out, _ := cmd.CombinedOutput()
+							os.WriteFile("/root/.brook.tproxy.err", out, 0666)
+							cmd = nil
+						}()
+						w.Write([]byte("Diconnect"))
+					})
+					m.HandleFunc("/disconnect", func(w http.ResponseWriter, r *http.Request) {
+						if cmd == nil {
+							w.Write([]byte("Connect"))
+							return
+						}
+						if err := cmd.Process.Signal(syscall.SIGTERM); err != nil {
+							http.Error(w, err.Error(), 500)
+							return
+						}
+						w.Write([]byte("Connect"))
+					})
+					m.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+						if cmd == nil {
+							w.Write([]byte("Connect"))
+							return
+						}
+						w.Write([]byte("Diconnect"))
+					})
+					s := &http.Server{
+						Addr:    c.String("webListen"),
+						Handler: m,
+					}
+					go func() {
+						sigs := make(chan os.Signal, 1)
+						signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+						<-sigs
+						if cmd != nil {
+							cmd.Process.Signal(syscall.SIGTERM)
+						}
+						s.Shutdown(context.Background())
+					}()
+					return s.ListenAndServe()
 				}
 				if c.String("listen") == "" || c.String("server") == "" || c.String("password") == "" {
 					cli.ShowCommandHelp(c, "tproxy")
@@ -444,6 +613,7 @@ func main() {
 					}()
 				}
 				if !c.Bool("doNotRunScripts") {
+					s.ClearAutoScripts()
 					if err := s.RunAutoScripts(); err != nil {
 						return err
 					}
@@ -661,7 +831,7 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				if c.String("socks5") == "" || c.String("wssserver") == "" || c.String("password") == "" {
-					cli.ShowCommandHelp(c, "wsclient")
+					cli.ShowCommandHelp(c, "wssclient")
 					return nil
 				}
 				h, p, err := net.SplitHostPort(c.String("socks5"))
@@ -1080,7 +1250,7 @@ func main() {
 		},
 	}
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
 
