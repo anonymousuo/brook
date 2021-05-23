@@ -1,11 +1,12 @@
 ## 运行 brook wssserver
 
-确保你的域名已经解析到你的服务器 IP, brook 会自动签发域名证书. 假设你的域名是 `domain.com`. 如果有防火墙, 记得允许 80, 443 端口的 TCP 协议.
+确保你的域名已经解析到你的服务器 IP, brook 会自动签发域名证书. 假设你的域名是 `domain.com`. 如果有防火墙, 记得允许**端口80和443的 TCP 协议**.
 
 ```
 $ brook wssserver --domain domain.com --password hello
 ```
 
+> 你可以按组合键 CTRL+C 来停止<br/>
 > 更多参数介绍: \$ brook wssserver -h
 
 那么你的 brook wssserver 是: `wss://domain.com:443`
@@ -70,4 +71,18 @@ $ jinbe brook wssserver --domain domain.com --password hello
 
 ```
 $ jinbe joker brook wssserver --domain domain.com --password hello
+```
+
+查看 jinbe 添加的所有开机命令
+
+```
+$ jinbe list
+```
+
+移除 jinbe 添加的某个开机命令
+
+> \$ jinbe list 会输出所有开机命令 ID
+
+```
+$ jinbe remove <ID>
 ```

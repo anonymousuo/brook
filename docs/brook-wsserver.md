@@ -1,6 +1,6 @@
 ## Run brook wsserver
 
-Assume the port is `9999` and the password is `hello`. If there is a firewall, remember to allow the TCP port.
+Assume the port is `9999` and the password is `hello`. If there is a firewall, remember to open **TCP on port 9999**.
 
 ```
 $ brook wsserver --listen :9999 --password hello
@@ -8,6 +8,7 @@ $ brook wsserver --listen :9999 --password hello
 
 Assuming your server public IP is `1.2.3.4`, your brook wsserver is `ws://1.2.3.4:9999`
 
+> You can stop it with CTRL+C<br/>
 > More parameters: \$ brook wsserver -h
 
 ---
@@ -72,4 +73,18 @@ Or with joker
 
 ```
 $ jinbe joker brook wsserver --listen :9999 --password hello
+```
+
+View added commmands via jinbe
+
+```
+$ jinbe list
+```
+
+Remove a added command via jinbe
+
+> Your can get ID from output by \$ jinbe list
+
+```
+$ jinbe remove <ID>
 ```

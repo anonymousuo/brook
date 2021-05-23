@@ -1,6 +1,6 @@
 ## 运行 brook wsserver
 
-假设选择端口`9999`, 密码`hello`. 如果有防火墙, 记得允许此端口的 TCP 协议.
+假设选择端口`9999`, 密码`hello`. 如果有防火墙, 记得允许**端口9999的 TCP 协议**.
 
 ```
 $ brook wsserver --listen :9999 --password hello
@@ -8,6 +8,7 @@ $ brook wsserver --listen :9999 --password hello
 
 假设你的服务器 IP 是 `1.2.3.4`, 那么你的 brook wsserver 是: `ws://1.2.3.4:9999`
 
+> 你可以按组合键 CTRL+C 来停止<br/>
 > 更多参数介绍: \$ brook wsserver -h
 
 ## 使用`nohup`后台运行
@@ -70,4 +71,18 @@ $ jinbe brook wsserver --listen :9999 --password hello
 
 ```
 $ jinbe joker brook wsserver --listen :9999 --password hello
+```
+
+查看 jinbe 添加的所有开机命令
+
+```
+$ jinbe list
+```
+
+移除 jinbe 添加的某个开机命令
+
+> \$ jinbe list 会输出所有开机命令 ID
+
+```
+$ jinbe remove <ID>
 ```

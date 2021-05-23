@@ -1,11 +1,12 @@
 ## Run brook wssserver
 
-Make sure your domain name has been resolved successfully. Brook will automatically issue a certificate for your server, assuming your domain is `domain.com`. If there is a firewall, remember to allow TCP on this port 80 and 443.
+Make sure your domain name has been resolved successfully. Brook will automatically issue a certificate for your server, assuming your domain is `domain.com`. If there is a firewall, remember to open **TCP on port 80 and 443**.
 
 ```
 $ brook wssserver --domain domain.com --password hello
 ```
 
+> You can stop it with CTRL+C<br/>
 > More parameters: \$ brook wssserver -h
 
 Then your brook wssserver should be: `wss://domain.com:443`
@@ -72,4 +73,18 @@ Or with joker
 
 ```
 $ jinbe joker brook wssserver --domain domain.com --password hello
+```
+
+View added commmands via jinbe
+
+```
+$ jinbe list
+```
+
+Remove a added command via jinbe
+
+> Your can get ID from output by \$ jinbe list
+
+```
+$ jinbe remove <ID>
 ```
